@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendorled — Sell Your Development Without an Agent</title>
+<meta name="description" content="Vendorled replaces your real estate agent with a full-stack AI platform — from listing to lead qualification to booked appointments. Australian developers save $12,500+ per sale.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  /* ── TOKENS ── */
+  :root {
+    --color-bg: #FFFFFF;
+    --color-surface: #F7F4FF;
+    --color-surface-2: #F2F0FC;
+    --color-dark: #0D0D0D;
+    --color-accent: #6C3BFF;
+    --color-accent-hover: #5a2ee6;
+    --color-text: #1a1a1a;
+    --color-muted: #888888;
+    --color-border: #E8E4F4;
+    --color-dark-bg: #1a0a3d;
+    --radius-card: 12px;
+    --radius-pill: 999px;
+    --nav-h: 68px;
+  }
+
+  /* ── RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; line-height: 1.15; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    border: 1.5px solid var(--color-accent);
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 24px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-accent);
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: var(--radius-pill);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 18px rgba(108,59,255,0.3);
+  }
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(108,59,255,0.4);
+  }
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    color: var(--color-accent);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 0;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    text-decoration-color: transparent;
+    text-underline-offset: 3px;
+  }
+  .btn-outline:hover { text-decoration: underline; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  section { position: relative; }
+
+  /* ═══════════════════════════════
+     NAV
+  ═══════════════════════════════ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 900;
+    height: var(--nav-h);
+    transition: background 0.3s, border-bottom 0.3s, backdrop-filter 0.3s;
+    background: transparent;
+  }
+  nav.scrolled {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .nav-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .nav-mark {
+    width: 36px; height: 36px;
+    background: var(--color-accent);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-mark svg { width: 18px; height: 18px; }
+  .nav-wordmark {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-dark);
+    letter-spacing: -0.3px;
+  }
+  .nav-wordmark span { color: var(--color-accent); }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    opacity: 0.75;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-cta { margin-left: auto; }
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-dark);
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: var(--nav-h);
+    left: 0; right: 0;
+    background: white;
+    border-bottom: 1px solid var(--color-border);
+    padding: 20px 24px;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 890;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text);
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-surface-2);
+  }
+
+  /* ═══════════════════════════════
+     HERO
+  ═══════════════════════════════ */
+  .hero {
+    min-height: 100svh;
+    padding-top: var(--nav-h);
+    display: flex;
+    align-items: center;
+    background: linear-gradient(160deg, #fff 0%, #F7F4FF 55%, #EDE8FF 100%);
+    overflow: hidden;
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    padding: 80px 24px;
+    max-width: 1160px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .hero-content { max-width: 580px; }
+  .hero-tagline-pill {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: 12px;
+    display: block;
+  }
+  .hero h1 {
+    font-size: clamp(44px, 5.5vw, 72px);
+    font-weight: 800;
+    color: var(--color-dark);
+    letter-spacing: -1.5px;
+    line-height: 1.08;
+    margin-bottom: 20px;
+  }
+  .hero-sub {
+    font-size: 18px;
+    color: var(--color-muted);
+    line-height: 1.65;
+    margin-bottom: 36px;
+    max-width: 440px;
+  }
+  .hero-cta-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 44px;
+  }
+  .waitlist-counter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar-row {
+    display: flex;
+    align-items: center;
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    margin-left: -8px;
+    flex-shrink: 0;
+  }
+  .avatar:first-child { margin-left: 0; }
+  .avatar-1 { background: #6C3BFF; }
+  .avatar-2 { background: #9B59B6; }
+  .avatar-3 { background: #3498DB; }
+  .avatar-4 { background: #E74C3C; }
+  .avatar-5 { background: #27AE60; }
+  .counter-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+  .counter-text strong {
+    color: var(--color-accent);
+    font-size: 18px;
+  }
+
+  /* ── Hero Dashboard Mockup ── */
+  .hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .dashboard-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 24px 80px rgba(108,59,255,0.15), 0 4px 16px rgba(0,0,0,0.06);
+    padding: 0;
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+  .dash-header {
+    background: var(--color-dark);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dash-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .dash-dot.red { background: #FF5F57; }
+  .dash-dot.yellow { background: #FEBC2E; }
+  .dash-dot.green { background: #28C840; }
+  .dash-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+  }
+  .dash-body { padding: 20px; }
+  .dash-stats {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .dash-stat-chip {
+    flex: 1;
+    background: var(--color-surface);
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .dash-stat-chip .num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-accent);
+    display: block;
+  }
+  .dash-stat-chip .lbl {
+    font-size: 11px;
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+  .dash-section-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 10px;
+  }
+  .lead-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--color-surface-2);
+  }
+  .lead-row:last-child { border-bottom: none; }
+  .lead-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+  .lead-info { flex: 1; }
+  .lead-name { font-size: 13px; font-weight: 600; color: var(--color-dark); }
+  .lead-time { font-size: 11px; color: var(--color-muted); }
+  .lead-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .badge-booked { background: #DCFCE7; color: #166534; }
+  .badge-qualified { background: #EDE8FF; color: var(--color-accent); }
+  .badge-calling { background: #FEF9C3; color: #854D0E; }
+
+  /* Notification card */
+  .notif-card {
+    position: absolute;
+    bottom: -16px;
+    right: -24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    padding: 14px 16px;
+    width: 210px;
+    border: 1px solid var(--color-border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: notifDrop 0.5s cubic-bezier(0.22,1,0.36,1) 1.5s forwards;
+  }
+  @keyframes notifDrop {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .notif-icon {
+    width: 32px; height: 32px;
+    background: #DCFCE7;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .notif-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 2px;
+  }
+  .notif-sub { font-size: 11px; color: var(--color-muted); }
+  .notif-time { font-size: 10px; color: var(--color-accent); font-weight: 600; margin-top: 4px; }
+
+  /* ═══════════════════════════════
+     SECTION SHARED
+  ═══════════════════════════════ */
+  .section-pad { padding: 100px 0; }
+  .section-pad-sm { padding: 72px 0; }
+  .text-center { text-align: center; }
+  .section-headline {
+    font-size: clamp(30px, 3.8vw, 48px);
+    font-weight: 800;
+    color: var(--color-dark);
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .section-sub {
+    font-size: 18px;
+    color: var(--color-muted);
+    max-width: 560px;
+    line-height: 1.65;
+  }
+  .mx-auto { margin-left: auto; margin-right: auto; }
+
+  /* ═══════════════════════════════
+     PROBLEM
+  ═══════════════════════════════ */
+  .problem { background: var(--color-surface); }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+  .problem-card {
+    background: var(--color-dark-bg);
+    border-radius: var(--radius-card);
+    padding: 36px 32px;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.25s;
+  }
+  .problem-card:hover { transform: translateY(-4px); }
+  .problem-icon {
+    width: 48px; height: 48px;
+    background: rgba(108,59,255,0.25);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 22px;
+  }
+  .problem-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: white;
+    letter-spacing: -0.3px;
+  }
+  .problem-card p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.65);
+  }
+
+  /* ═══════════════════════════════
+     SOLUTION
+  ═══════════════════════════════ */
+  .solution { background: white; }
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 64px;
+    position: relative;
+  }
+  .flow-steps::after {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: calc(12.5% + 28px);
+    right: calc(12.5% + 28px);
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-accent), rgba(108,59,255,0.2));
+    z-index: 0;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .flow-num {
+    width: 56px; height: 56px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 6px 20px rgba(108,59,255,0.35);
+  }
+  .flow-step h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 8px;
+    letter-spacing: -0.2px;
+  }
+  .flow-step p {
+    font-size: 14px;
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  /* ═══════════════════════════════
+     FEATURES
+  ═══════════════════════════════ */
+  .features { background: white; }
+  .feature-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    padding: 80px 0;
+    border-bottom: 1px solid var(--color-surface-2);
+  }
+  .feature-row:last-child { border-bottom: none; }
+  .feature-row.reverse .feature-text { order: 2; }
+  .feature-row.reverse .feature-visual { order: 1; }
+  .feature-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 16px;
+    display: block;
+  }
+  .feature-text h3 {
+    font-size: clamp(24px, 2.5vw, 34px);
+    font-weight: 800;
+    color: var(--color-dark);
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+  .feature-text p {
+    font-size: 16px;
+    color: var(--color-muted);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .stat-callout {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stat-pill {
+    background: var(--color-surface);
+    color: var(--color-accent);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+  }
+
+  /* ── CSS Mockups ── */
+  .mockup-wrap {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid var(--color-border);
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Phone call mockup */
+  .phone-mockup {
+    background: var(--color-dark);
+    border-radius: 20px;
+    padding: 24px;
+    width: 240px;
+    text-align: center;
+  }
+  .call-status {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #28C840;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .call-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 4px;
+  }
+  .call-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 20px; }
+  .waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 40px;
+    margin-bottom: 16px;
+  }
+  .waveform span {
+    display: block;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--color-accent);
+    animation: wave 1.2s ease-in-out infinite;
+  }
+  .waveform span:nth-child(1) { height: 10px; animation-delay: 0s; }
+  .waveform span:nth-child(2) { height: 22px; animation-delay: 0.1s; }
+  .waveform span:nth-child(3) { height: 32px; animation-delay: 0.2s; }
+  .waveform span:nth-child(4) { height: 18px; animation-delay: 0.3s; }
+  .waveform span:nth-child(5) { height: 28px; animation-delay: 0.4s; }
+  .waveform span:nth-child(6) { height: 14px; animation-delay: 0.5s; }
+  .waveform span:nth-child(7) { height: 24px; animation-delay: 0.35s; }
+  .waveform span:nth-child(8) { height: 10px; animation-delay: 0.15s; }
+  @keyframes wave {
+    0%, 100% { transform: scaleY(1); opacity: 0.7; }
+    50% { transform: scaleY(1.6); opacity: 1; }
+  }
+  .call-timer {
+    font-family: 'DM Mono', 'Space Grotesk', monospace;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+  .call-qualifier {
+    margin-top: 14px;
+    background: rgba(108,59,255,0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #a78fff;
+    font-weight: 600;
+  }
+
+  /* Browser / website mockup */
+  .browser-mockup {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .browser-bar {
+    background: #F5F5F5;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #E5E5E5;
+  }
+  .browser-dots { display: flex; gap: 5px; }
+  .browser-dot { width: 9px; height: 9px; border-radius: 50%; }
+  .browser-dot.r { background: #FF5F57; }
+  .browser-dot.y { background: #FEBC2E; }
+  .browser-dot.g { background: #28C840; }
+  .browser-url {
+    flex: 1;
+    background: white;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    color: #888;
+    border: 1px solid #E5E5E5;
+  }
+  .browser-content { padding: 16px; }
+  .site-hero-mock {
+    background: linear-gradient(135deg, var(--color-dark-bg), var(--color-accent));
+    border-radius: 8px;
+    height: 80px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+  }
+  .unit-grid-mock {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .unit-chip {
+    background: var(--color-surface);
+    border-radius: 5px;
+    padding: 6px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  .enquiry-bar {
+    background: var(--color-accent);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* Ads dashboard mockup */
+  .ads-mockup {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    width: 100%;
+    max-width: 320px;
+  }
+  .ads-header {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ads-live { font-size: 10px; background: #DCFCE7; color: #166534; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
+  .ads-metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .ads-metric {
+    background: var(--color-surface);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .ads-metric .val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-accent);
+    display: block;
+  }
+  .ads-metric .lbl { font-size: 10px; color: var(--color-muted); }
+  .spend-bar-wrap { margin-bottom: 8px; }
+  .spend-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--color-muted); margin-bottom: 4px; }
+  .spend-bar-bg { background: var(--color-surface); border-radius: 4px; height: 6px; }
+  .spend-bar-fill { background: var(--color-accent); border-radius: 4px; height: 6px; }
+  /* Simple SVG chart */
+  .chart-area { margin-top: 12px; }
+
+  /* Nurture timeline mockup */
+  .nurture-mockup {
+    width: 100%;
+    max-width: 300px;
+  }
+  .nurture-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 0;
+    position: relative;
+  }
+  .nurture-row:not(:last-child) .nurture-line {
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: -24px;
+    width: 2px;
+    background: var(--color-border);
+  }
+  .nurture-icon-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .nurture-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  .ni-call { background: #EDE8FF; }
+  .ni-sms { background: #DCFCE7; }
+  .ni-email { background: #FEF9C3; }
+  .nurture-content { padding-bottom: 24px; }
+  .nurture-day {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .nurture-desc { font-size: 13px; font-weight: 600; color: var(--color-dark); }
+  .nurture-sub { font-size: 11px; color: var(--color-muted); }
+
+  /* Command center mockup */
+  .command-mockup {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    width: 100%;
+    max-width: 320px;
+    overflow: hidden;
+  }
+  .command-header {
+    background: var(--color-dark);
+    padding: 12px 16px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+  }
+  .command-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--color-border);
+  }
+  .command-stat {
+    background: white;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .command-stat .n {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-accent);
+    display: block;
+  }
+  .command-stat .l { font-size: 10px; color: var(--color-muted); font-weight: 500; }
+  .command-leads { padding: 12px 16px; }
+
+  /* Portal mockup */
+  .portal-mockup {
+    width: 100%;
+    max-width: 300px;
+  }
+  .portal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border: 1px solid var(--color-border);
+  }
+  .portal-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-dark);
+  }
+  .portal-sub { font-size: 11px; color: var(--color-muted); }
+  .portal-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #166534;
+    background: #DCFCE7;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+  }
+  .portal-status::before { content: ''; display: block; width: 6px; height: 6px; border-radius: 50%; background: #16a34a; }
+
+  /* ═══════════════════════════════
+     ROI CALCULATOR
+  ═══════════════════════════════ */
+  .roi-section {
+    background: var(--color-dark-bg);
+    padding: 100px 0;
+  }
+  .roi-section .section-headline { color: white; }
+  .roi-section .eyebrow { color: #a78fff; border-color: #a78fff; }
+  .roi-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    margin-top: 48px;
+  }
+  .roi-inputs { display: flex; flex-direction: column; gap: 28px; }
+  .roi-field label {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 10px;
+    letter-spacing: 0.02em;
+  }
+  .roi-field input[type=range] {
+    width: 100%;
+    height: 5px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.15);
+    outline: none;
+    cursor: pointer;
+    accent-color: var(--color-accent);
+    margin-bottom: 8px;
+  }
+  .roi-field-vals {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    color: white;
+  }
+  .roi-results { display: flex; flex-direction: column; gap: 20px; }
+  .roi-result-card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-card);
+    padding: 24px 28px;
+  }
+  .roi-result-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .roi-result-val {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+  }
+  .roi-result-val.accent { color: var(--color-accent); }
+  .roi-result-val.saving {
+    font-size: 44px;
+    background: linear-gradient(135deg, #a78fff, #6C3BFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .roi-disclaimer { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 12px; }
+
+  /* ═══════════════════════════════
+     PRICING
+  ═══════════════════════════════ */
+  .pricing { background: var(--color-surface); }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+    align-items: stretch;
+  }
+  .pricing-card {
+    background: white;
+    border-radius: var(--radius-card);
+    padding: 36px 32px;
+    border: 1.5px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    transition: transform 0.25s, box-shadow 0.25s;
+    position: relative;
+  }
+  .pricing-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(108,59,255,0.1); }
+  .pricing-card.featured {
+    border-color: var(--color-accent);
+    background: var(--color-dark);
+    color: white;
+    box-shadow: 0 12px 40px rgba(108,59,255,0.25);
+  }
+  .popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-accent);
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .pricing-tier {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 12px;
+  }
+  .pricing-card.featured .pricing-tier { color: #a78fff; }
+  .pricing-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--color-dark);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .pricing-card.featured .pricing-price { color: white; }
+  .pricing-price span { font-size: 18px; font-weight: 500; letter-spacing: 0; }
+  .pricing-setup {
+    font-size: 14px;
+    color: var(--color-muted);
+    margin-bottom: 28px;
+  }
+  .pricing-card.featured .pricing-setup { color: rgba(255,255,255,0.5); }
+  .pricing-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin-bottom: 24px;
+  }
+  .pricing-card.featured .pricing-divider { background: rgba(255,255,255,0.15); }
+  .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 12px; flex: 1; margin-bottom: 32px; }
+  .pricing-features li {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--color-text);
+    align-items: flex-start;
+  }
+  .pricing-card.featured .pricing-features li { color: rgba(255,255,255,0.8); }
+  .pricing-features li::before {
+    content: '✓';
+    font-weight: 800;
+    color: var(--color-accent);
+    flex-shrink: 0;
+    font-size: 14px;
+    margin-top: 1px;
+  }
+  .pricing-card.featured .pricing-features li::before { color: #a78fff; }
+  .pricing-cta {
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    border-radius: var(--radius-pill);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: auto;
+  }
+  .pricing-cta:hover { background: var(--color-accent); color: white; }
+  .pricing-card.featured .pricing-cta {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+  }
+  .pricing-card.featured .pricing-cta:hover { background: var(--color-accent-hover); }
+  .pricing-note {
+    text-align: center;
+    margin-top: 32px;
+    font-size: 15px;
+    color: var(--color-muted);
+  }
+  .pricing-note strong { color: var(--color-accent); }
+
+  /* ═══════════════════════════════
+     FAQ
+  ═══════════════════════════════ */
+  .faq { background: white; }
+  .faq-list { margin-top: 56px; max-width: 760px; margin-left: auto; margin-right: auto; }
+  .faq-item {
+    border-bottom: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+  .faq-item:first-child { border-top: 1px solid var(--color-border); }
+  .faq-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 0;
+    cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-dark);
+    gap: 16px;
+    transition: color 0.2s;
+  }
+  .faq-q:hover { color: var(--color-accent); }
+  .faq-icon {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--color-accent);
+    transition: background 0.2s, transform 0.3s;
+    line-height: 1;
+  }
+  .faq-item.open .faq-icon { background: var(--color-accent); color: white; transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.2s;
+    padding: 0;
+  }
+  .faq-a-inner {
+    padding-bottom: 20px;
+    font-size: 15px;
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+  .faq-item.open .faq-a { max-height: 300px; }
+
+  /* ═══════════════════════════════
+     FINAL CTA
+  ═══════════════════════════════ */
+  .final-cta {
+    background: linear-gradient(160deg, #fff 0%, #F7F4FF 100%);
+    padding: 120px 0;
+    text-align: center;
+  }
+  .final-cta h2 {
+    font-size: clamp(36px, 4.5vw, 58px);
+    font-weight: 800;
+    color: var(--color-dark);
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .final-tagline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: 16px;
+    display: block;
+  }
+  .final-sub {
+    font-size: 17px;
+    color: var(--color-muted);
+    max-width: 500px;
+    margin: 0 auto 32px;
+    line-height: 1.65;
+  }
+  .final-counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .waitlist-form {
+    display: flex;
+    gap: 12px;
+    max-width: 460px;
+    margin: 0 auto 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .waitlist-form input[type=email] {
+    flex: 1;
+    min-width: 220px;
+    padding: 14px 20px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .waitlist-form input[type=email]:focus { border-color: var(--color-accent); }
+  .trust-line {
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-top: 12px;
+  }
+  .thank-you {
+    display: none;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-accent);
+    border-radius: var(--radius-card);
+    padding: 24px 32px;
+    max-width: 460px;
+    margin: 0 auto;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-align: center;
+  }
+
+  /* ═══════════════════════════════
+     FOOTER
+  ═══════════════════════════════ */
+  footer {
+    background: var(--color-dark);
+    color: rgba(255,255,255,0.6);
+    padding: 48px 0;
+  }
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .footer-wordmark {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+  }
+  .footer-wordmark span { color: var(--color-accent); }
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: white; }
+  .footer-tagline {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  .footer-bottom {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-copy { font-size: 13px; color: rgba(255,255,255,0.35); }
+  .footer-contact { font-size: 13px; color: var(--color-accent); }
+  .footer-contact:hover { text-decoration: underline; }
+
+  /* ═══════════════════════════════
+     RESPONSIVE
+  ═══════════════════════════════ */
+  @media (max-width: 768px) {
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+
+    .hero-inner {
+      grid-template-columns: 1fr;
+      padding: 60px 24px 40px;
+      gap: 48px;
+    }
+    .hero-content { max-width: 100%; }
+    .hero-visual { justify-content: center; }
+    .notif-card { right: -8px; bottom: -8px; }
+
+    .problem-grid { grid-template-columns: 1fr; }
+    .flow-steps { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .flow-steps::after { display: none; }
+
+    .feature-row {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 60px 0;
+    }
+    .feature-row.reverse .feature-text { order: 0; }
+    .feature-row.reverse .feature-visual { order: 1; }
+
+    .roi-inner { grid-template-columns: 1fr; gap: 40px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; }
+
+    .waitlist-form { flex-direction: column; }
+    .waitlist-form input[type=email] { min-width: 100%; }
+    .waitlist-form .btn-primary { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .flow-steps { grid-template-columns: 1fr; }
+    .dash-stats { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════
+     NAV
+═══════════════════════════════ -->
+<nav id="main-nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" aria-label="Vendorled home">
+      <div class="nav-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4L20 8V12C20 16.4 16.4 20.4 12 21C7.6 20.4 4 16.4 4 12V8L12 4Z" fill="white" opacity="0.25"/>
+          <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="nav-wordmark">Vendor<span>led</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQs</a></li>
+    </ul>
+    <a href="#waitlist" class="btn-primary nav-cta">Join the Waitlist</a>
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#how-it-works" onclick="closeMobileMenu()">How It Works</a>
+  <a href="#features" onclick="closeMobileMenu()">Features</a>
+  <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+  <a href="#faq" onclick="closeMobileMenu()">FAQs</a>
+  <a href="#waitlist" class="btn-primary" style="text-align:center;justify-content:center;" onclick="closeMobileMenu()">Join the Waitlist</a>
+</div>
+
+<!-- ═══════════════════════════════
+     HERO
+═══════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <span class="eyebrow">AI-powered property sales</span>
+      <h1>Sell your development.<br>Keep your margin.</h1>
+      <span class="hero-tagline-pill">Your sale. Your terms.</span>
+      <p class="hero-sub">Vendorled replaces your real estate agent with a full-stack AI platform — from listing to lead qualification to booked appointments. Australian developers save $12,500+ per sale.</p>
+      <div class="hero-cta-row">
+        <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+        <a href="#how-it-works" class="btn-outline">See How It Works ↓</a>
+      </div>
+      <div class="waitlist-counter">
+        <div class="avatar-row">
+          <div class="avatar avatar-1">JM</div>
+          <div class="avatar avatar-2">SR</div>
+          <div class="avatar avatar-3">AL</div>
+          <div class="avatar avatar-4">TK</div>
+          <div class="avatar avatar-5">PB</div>
+        </div>
+        <div class="counter-text">
+          <strong id="hero-counter">47</strong> developers already on the waitlist
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div style="position:relative; width:100%; max-width:420px;">
+        <div class="dashboard-card">
+          <div class="dash-header">
+            <span class="dash-dot red"></span>
+            <span class="dash-dot yellow"></span>
+            <span class="dash-dot green"></span>
+            <span class="dash-title">Command Center — Riviera Apartments</span>
+          </div>
+          <div class="dash-body">
+            <div class="dash-stats">
+              <div class="dash-stat-chip">
+                <span class="num">14</span>
+                <span class="lbl">Leads</span>
+              </div>
+              <div class="dash-stat-chip">
+                <span class="num">6</span>
+                <span class="lbl">Qualified</span>
+              </div>
+              <div class="dash-stat-chip">
+                <span class="num">3</span>
+                <span class="lbl">Booked</span>
+              </div>
+            </div>
+            <div class="dash-section-label">Live Lead Feed</div>
+            <div class="lead-row">
+              <div class="lead-avatar">SL</div>
+              <div class="lead-info">
+                <div class="lead-name">Sarah L.</div>
+                <div class="lead-time">2 mins ago</div>
+              </div>
+              <span class="lead-badge badge-booked">Booked</span>
+            </div>
+            <div class="lead-row">
+              <div class="lead-avatar">MT</div>
+              <div class="lead-info">
+                <div class="lead-name">Marcus T.</div>
+                <div class="lead-time">18 mins ago</div>
+              </div>
+              <span class="lead-badge badge-qualified">Qualified</span>
+            </div>
+            <div class="lead-row">
+              <div class="lead-avatar">AK</div>
+              <div class="lead-info">
+                <div class="lead-name">Amy K.</div>
+                <div class="lead-time">41 mins ago</div>
+              </div>
+              <span class="lead-badge badge-calling">Calling</span>
+            </div>
+            <div class="lead-row">
+              <div class="lead-avatar">RP</div>
+              <div class="lead-info">
+                <div class="lead-name">Ryan P.</div>
+                <div class="lead-time">1 hr ago</div>
+              </div>
+              <span class="lead-badge badge-booked">Booked</span>
+            </div>
+          </div>
+        </div>
+        <div class="notif-card">
+          <div class="notif-icon">📅</div>
+          <div>
+            <div class="notif-title">New Booking</div>
+            <div class="notif-sub">Sarah L. — Apt 4B inspection</div>
+            <div class="notif-time">Just now · via AI Voice</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     PROBLEM
+═══════════════════════════════ -->
+<section class="problem section-pad">
+  <div class="container">
+    <div class="text-center">
+      <span class="eyebrow">The Problem</span>
+      <h2 class="section-headline">The agent model was built<br>for a different era.</h2>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">💸</div>
+        <h3>2.5% per sale. Every time.</h3>
+        <p>On a $500k unit that's $12,500 out of your margin — for slow responses, missed calls, and a salesperson juggling 20 other listings.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🔗</div>
+        <h3>You don't own your buyer relationships.</h3>
+        <p>Agents own the data. When the campaign ends, so does your visibility into who enquired, who was interested, and why deals fell over.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">⏱</div>
+        <h3>Leads go cold in minutes.</h3>
+        <p>The average agent responds to a property enquiry in 4+ hours. By then, your buyer has moved on. Speed is the difference between a booking and a bounce.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     SOLUTION
+═══════════════════════════════ -->
+<section class="solution section-pad" id="how-it-works">
+  <div class="container">
+    <div class="text-center">
+      <span class="eyebrow">The Solution</span>
+      <h2 class="section-headline">Your development. Your leads.<br>Your data. Zero agents.</h2>
+      <p class="section-sub mx-auto" style="margin-top:16px;">Vendorled automates the entire sales process from the moment you upload your project to the moment a qualified buyer lands in your calendar.</p>
+    </div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <h3>Upload Your Project</h3>
+        <p>Renders, floorplans, pricing, unit mix — all in one place.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <h3>Go Live Instantly</h3>
+        <p>Project website generated + listing published + ads launched.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <h3>AI Engages Every Lead</h3>
+        <p>Voice agent calls every enquiry within 60 seconds, 24/7.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <h3>Qualified Buyers Booked</h3>
+        <p>Meetings land directly in your calendar, automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FEATURES
+═══════════════════════════════ -->
+<section class="features section-pad" id="features">
+  <div class="container">
+    <div class="text-center">
+      <span class="eyebrow">Features</span>
+      <h2 class="section-headline">Everything the agent did.<br>Done better. Done automatically.</h2>
+    </div>
+
+    <!-- Feature 1 -->
+    <div class="feature-row">
+      <div class="feature-text">
+        <span class="feature-label">24/7 Lead Response</span>
+        <h3>While agents sleep, our AI sells.</h3>
+        <p>Every enquiry triggers an immediate AI voice call — within 60 seconds. Natural conversation, no scripts that sound robotic. The AI qualifies budget, timeline, and readiness, then books the meeting.</p>
+        <div class="stat-callout">
+          <span class="stat-pill">&#60; 60 second response time</span>
+          <span class="stat-pill">24/7 availability</span>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="mockup-wrap">
+          <div class="phone-mockup">
+            <div class="call-status">● Live Call</div>
+            <div class="call-name">David Chen</div>
+            <div class="call-sub">Enquired · Apt 12A · $620k</div>
+            <div class="waveform">
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="call-timer">02:14</div>
+            <div class="call-qualifier">Qualifying budget &amp; timeline...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2 -->
+    <div class="feature-row reverse">
+      <div class="feature-text">
+        <span class="feature-label">Instant Web Presence</span>
+        <h3>Agency-grade websites. Generated in seconds.</h3>
+        <p>Upload your renders and pricing. Vendorled generates a professional, SEO-optimised development website instantly — with lead capture, floor plan viewer, and availability tracker built in.</p>
+        <div class="stat-callout">
+          <span class="stat-pill">Mobile-first</span>
+          <span class="stat-pill">Core Web Vitals optimised</span>
+          <span class="stat-pill">Live in under 5 minutes</span>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="mockup-wrap">
+          <div class="browser-mockup">
+            <div class="browser-bar">
+              <div class="browser-dots">
+                <div class="browser-dot r"></div>
+                <div class="browser-dot y"></div>
+                <div class="browser-dot g"></div>
+              </div>
+              <div class="browser-url">riviera-apartments.vendorled.com.au</div>
+            </div>
+            <div class="browser-content">
+              <div class="site-hero-mock">Riviera Apartments</div>
+              <div class="unit-grid-mock">
+                <div class="unit-chip">1BR<br>From $420k</div>
+                <div class="unit-chip">2BR<br>From $590k</div>
+                <div class="unit-chip">3BR<br>From $820k</div>
+                <div class="unit-chip" style="color:#888;background:#f0f0f0;">SOLD</div>
+                <div class="unit-chip">Avail.</div>
+                <div class="unit-chip">Avail.</div>
+              </div>
+              <div class="enquiry-bar">Enquire Now →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 3 -->
+    <div class="feature-row">
+      <div class="feature-text">
+        <span class="feature-label">Lead Generation</span>
+        <h3>AI-managed Meta and Google campaigns.</h3>
+        <p>Set your budget. Vendorled handles the rest — campaign creation, audience targeting, creative rotation, and bid optimisation. Your ads run while you focus on the build.</p>
+        <div class="stat-callout">
+          <span class="stat-pill">Meta</span>
+          <span class="stat-pill">Google</span>
+          <span class="stat-pill">Automated optimisation</span>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="mockup-wrap">
+          <div class="ads-mockup">
+            <div class="ads-header">
+              Campaign Performance
+              <span class="ads-live">Live</span>
+            </div>
+            <div class="ads-metric-row">
+              <div class="ads-metric">
+                <span class="val">$42</span>
+                <span class="lbl">CPL</span>
+              </div>
+              <div class="ads-metric">
+                <span class="val">847</span>
+                <span class="lbl">Reach K</span>
+              </div>
+              <div class="ads-metric">
+                <span class="val">28</span>
+                <span class="lbl">Leads</span>
+              </div>
+            </div>
+            <div class="spend-bar-wrap">
+              <div class="spend-bar-label"><span>Ad Spend</span><span>$1,180 / $2,000</span></div>
+              <div class="spend-bar-bg"><div class="spend-bar-fill" style="width:59%"></div></div>
+            </div>
+            <div class="chart-area">
+              <svg width="100%" height="60" viewBox="0 0 280 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="0,50 40,40 80,35 120,22 160,28 200,15 240,10 280,8" stroke="#6C3BFF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="0,50 40,40 80,35 120,22 160,28 200,15 240,10 280,8 280,60 0,60" fill="rgba(108,59,255,0.07)"/>
+                <circle cx="280" cy="8" r="4" fill="#6C3BFF"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 4 -->
+    <div class="feature-row reverse">
+      <div class="feature-text">
+        <span class="feature-label">Multi-Channel Follow-Up</span>
+        <h3>No lead goes cold. Ever.</h3>
+        <p>Leads who don't book immediately enter an automated sequence — follow-up voice calls, SMS, and personalised emails timed to buyer behaviour. The AI persists until they book, opt out, or are disqualified.</p>
+        <div class="stat-callout">
+          <span class="stat-pill">Voice</span>
+          <span class="stat-pill">SMS</span>
+          <span class="stat-pill">Email</span>
+          <span class="stat-pill">All automated</span>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="mockup-wrap">
+          <div class="nurture-mockup">
+            <div class="nurture-row">
+              <div class="nurture-icon-wrap">
+                <div class="nurture-icon ni-call">📞</div>
+                <div class="nurture-line"></div>
+              </div>
+              <div class="nurture-content">
+                <div class="nurture-day">Day 0 — Instant</div>
+                <div class="nurture-desc">AI Voice Call</div>
+                <div class="nurture-sub">Qualification + booking attempt</div>
+              </div>
+            </div>
+            <div class="nurture-row">
+              <div class="nurture-icon-wrap">
+                <div class="nurture-icon ni-sms">💬</div>
+                <div class="nurture-line"></div>
+              </div>
+              <div class="nurture-content">
+                <div class="nurture-day">Day 1</div>
+                <div class="nurture-desc">SMS Follow-Up</div>
+                <div class="nurture-sub">Personalised project link</div>
+              </div>
+            </div>
+            <div class="nurture-row">
+              <div class="nurture-icon-wrap">
+                <div class="nurture-icon ni-email">✉️</div>
+                <div class="nurture-line"></div>
+              </div>
+              <div class="nurture-content">
+                <div class="nurture-day">Day 3</div>
+                <div class="nurture-desc">Email Nurture</div>
+                <div class="nurture-sub">Floor plans + pricing pack</div>
+              </div>
+            </div>
+            <div class="nurture-row">
+              <div class="nurture-icon-wrap">
+                <div class="nurture-icon ni-call">📞</div>
+              </div>
+              <div class="nurture-content" style="padding-bottom:0">
+                <div class="nurture-day">Day 7</div>
+                <div class="nurture-desc">AI Voice Call #2</div>
+                <div class="nurture-sub">Re-qualification + final booking push</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 5 -->
+    <div class="feature-row">
+      <div class="feature-text">
+        <span class="feature-label">You're in Control</span>
+        <h3>Your entire sales pipeline. One screen.</h3>
+        <p>See every lead, every call recording, every booking in real time. Listen back to AI conversations. Approve calendar bookings. Export your data any time — you own it all.</p>
+        <div class="stat-callout">
+          <span class="stat-pill">Live lead feed</span>
+          <span class="stat-pill">Call recordings</span>
+          <span class="stat-pill">Full data ownership</span>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="mockup-wrap">
+          <div class="command-mockup">
+            <div class="command-header">Command Center — This Week</div>
+            <div class="command-stats">
+              <div class="command-stat">
+                <span class="n">47</span>
+                <span class="l">Leads</span>
+              </div>
+              <div class="command-stat">
+                <span class="n">31</span>
+                <span class="l">Calls</span>
+              </div>
+              <div class="command-stat">
+                <span class="n">12</span>
+                <span class="l">Booked</span>
+              </div>
+            </div>
+            <div class="command-leads">
+              <div class="dash-section-label">Recent Activity</div>
+              <div class="lead-row">
+                <div class="lead-avatar">JW</div>
+                <div class="lead-info">
+                  <div class="lead-name">James W. — Call Recording</div>
+                  <div class="lead-time">3:42 · Qualified · Budget $680k</div>
+                </div>
+              </div>
+              <div class="lead-row" style="border-bottom:none">
+                <div class="lead-avatar">PH</div>
+                <div class="lead-info">
+                  <div class="lead-name">Priya H. — Booking Confirmed</div>
+                  <div class="lead-time">Tomorrow 10:30am · Apt 7C</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 6 -->
+    <div class="feature-row reverse">
+      <div class="feature-text">
+        <span class="feature-label">Portal Distribution</span>
+        <h3>Publish once. Distribute everywhere.</h3>
+        <p>Vendorled distributes your listing to Australia's major property portals and generates a formatted upload package for REA and Domain — all from a single project setup.</p>
+        <div class="stat-callout">
+          <span class="stat-pill">REA</span>
+          <span class="stat-pill">Domain</span>
+          <span class="stat-pill">Off The Plan portals</span>
+        </div>
+      </div>
+      <div class="feature-visual">
+        <div class="mockup-wrap">
+          <div class="portal-mockup">
+            <div class="portal-row">
+              <div>
+                <div class="portal-name">realestate.com.au</div>
+                <div class="portal-sub">Premium listing · 3 portals</div>
+              </div>
+              <div class="portal-status">Published</div>
+            </div>
+            <div class="portal-row">
+              <div>
+                <div class="portal-name">domain.com.au</div>
+                <div class="portal-sub">Standard listing</div>
+              </div>
+              <div class="portal-status">Published</div>
+            </div>
+            <div class="portal-row">
+              <div>
+                <div class="portal-name">offtheplan.com.au</div>
+                <div class="portal-sub">Off-the-plan category</div>
+              </div>
+              <div class="portal-status">Published</div>
+            </div>
+            <div class="portal-row" style="margin-bottom:0">
+              <div>
+                <div class="portal-name">newhomesguide.com.au</div>
+                <div class="portal-sub">New homes category</div>
+              </div>
+              <div class="portal-status">Published</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     ROI CALCULATOR
+═══════════════════════════════ -->
+<section class="roi-section">
+  <div class="container">
+    <div class="text-center">
+      <span class="eyebrow" style="color:#a78fff;border-color:#a78fff;">ROI Calculator</span>
+      <h2 class="section-headline" style="color:white;">How much are agents costing you?</h2>
+    </div>
+    <div class="roi-inner">
+      <div class="roi-inputs">
+        <div class="roi-field">
+          <label>Number of units in your next project</label>
+          <input type="range" id="roi-units" min="1" max="200" value="20" oninput="calcROI()">
+          <div class="roi-field-vals">
+            <span>1 unit</span>
+            <span id="val-units" style="color:var(--color-accent)">20 units</span>
+            <span>200 units</span>
+          </div>
+        </div>
+        <div class="roi-field">
+          <label>Average sale price per unit</label>
+          <input type="range" id="roi-price" min="200000" max="3000000" step="50000" value="500000" oninput="calcROI()">
+          <div class="roi-field-vals">
+            <span>$200k</span>
+            <span id="val-price" style="color:var(--color-accent)">$500,000</span>
+            <span>$3m</span>
+          </div>
+        </div>
+        <div class="roi-field">
+          <label>Agent commission rate</label>
+          <input type="range" id="roi-commission" min="1" max="4" step="0.25" value="2.5" oninput="calcROI()">
+          <div class="roi-field-vals">
+            <span>1%</span>
+            <span id="val-commission" style="color:var(--color-accent)">2.5%</span>
+            <span>4%</span>
+          </div>
+        </div>
+      </div>
+      <div class="roi-results">
+        <div class="roi-result-card">
+          <div class="roi-result-label">Agent commission total</div>
+          <div class="roi-result-val accent" id="roi-commission-total">$250,000</div>
+        </div>
+        <div class="roi-result-card">
+          <div class="roi-result-label">Vendorled annual cost (Professional plan)</div>
+          <div class="roi-result-val" id="roi-vendorled-cost">$14,976</div>
+        </div>
+        <div class="roi-result-card" style="background:rgba(108,59,255,0.15);border-color:rgba(108,59,255,0.4);">
+          <div class="roi-result-label" style="color:rgba(255,255,255,0.8);">Your saving</div>
+          <div class="roi-result-val saving" id="roi-saving">$235,024</div>
+        </div>
+        <p class="roi-disclaimer">Based on Professional plan at $999/mo + $2,999 setup over 12 months. Actual savings vary by project scope and duration.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     PRICING
+═══════════════════════════════ -->
+<section class="pricing section-pad" id="pricing">
+  <div class="container">
+    <div class="text-center">
+      <span class="eyebrow">Pricing</span>
+      <h2 class="section-headline">Transparent pricing. Zero commissions.</h2>
+      <p class="section-sub mx-auto" style="margin-top:16px;">Compare this to a 2.5% agent commission on a $500k unit — $12,500 per sale.</p>
+    </div>
+    <div class="pricing-grid">
+      <!-- Essential -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Essential</div>
+        <div class="pricing-price">$499<span>/mo</span></div>
+        <div class="pricing-setup">+ $1,999 setup · per project</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Project website</li>
+          <li>Basic CRM</li>
+          <li>Email automation</li>
+          <li>Standard support</li>
+        </ul>
+        <button class="pricing-cta" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">Join Waitlist</button>
+      </div>
+      <!-- Professional -->
+      <div class="pricing-card featured">
+        <div class="popular-badge">Most Popular</div>
+        <div class="pricing-tier">Professional</div>
+        <div class="pricing-price">$999<span>/mo</span></div>
+        <div class="pricing-setup" style="color:rgba(255,255,255,0.5)">+ $2,999 setup · per project</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Everything in Essential</li>
+          <li>AI voice agents (unlimited)</li>
+          <li>Auto-booking to your calendar</li>
+          <li>Advanced analytics dashboard</li>
+          <li>Ad campaign management</li>
+          <li>Priority onboarding</li>
+        </ul>
+        <button class="pricing-cta" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">Join Waitlist</button>
+      </div>
+      <!-- Enterprise -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Enterprise</div>
+        <div class="pricing-price" style="font-size:28px;padding-top:6px;">Custom</div>
+        <div class="pricing-setup">Tailored to your project portfolio</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Multi-project dashboard</li>
+          <li>API access</li>
+          <li>White label option</li>
+          <li>Dedicated success manager</li>
+        </ul>
+        <button class="pricing-cta" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">Talk to Us</button>
+      </div>
+    </div>
+    <p class="pricing-note">On a 20-unit project at $500k average, Professional plan saves you <strong>$235,024+</strong> vs agent commissions.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FAQ
+═══════════════════════════════ -->
+<section class="faq section-pad" id="faq">
+  <div class="container">
+    <div class="text-center">
+      <span class="eyebrow">FAQs</span>
+      <h2 class="section-headline">Frequently Asked Questions</h2>
+    </div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          Do I need a real estate licence to use Vendorled?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">You need to hold a valid real estate licence or be onboarded in partnership with a licensed professional. Vendorled is designed to work within Australian property law. We verify your credentials during onboarding.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          How does the AI voice agent sound?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Natural. The AI uses advanced voice synthesis with sub-500ms response latency — the industry benchmark for human-like conversation. You can listen to real call recordings before you commit.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          Can I still list on REA and Domain?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Yes. Vendorled generates a fully formatted, portal-ready listing package for REA and Domain that takes under 5 minutes to upload. We also integrate with listing aggregators for automated distribution.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          What happens to my buyer data?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">You own it entirely. All lead data, call recordings, and contact details belong to your organisation and are stored securely in Australia. You can export everything at any time.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          How quickly does the AI respond to a new enquiry?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Within 60 seconds of a lead submitting an enquiry — day or night. Compare that to the industry average of 4+ hours for agent follow-up.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          What's the difference between Vendorled and 360AI?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">360AI handles post-enquiry nurture only — SMS and email follow-up after a lead already exists. Vendorled owns the entire funnel: we generate your website, run your ads, call your leads the moment they enquire, and book the meeting. 360AI has no website generation, no listing syndication, and no voice calling capability.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          When will I get access?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">We're launching with a South Australia pilot cohort first. Join the waitlist and you'll be notified when your region opens.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FINAL CTA
+═══════════════════════════════ -->
+<section class="final-cta" id="waitlist">
+  <div class="container">
+    <span class="final-tagline">Your sale. Your terms.</span>
+    <h2>Stop paying agents to open doors<br>you could open yourself.</h2>
+    <p class="final-sub">Join the waitlist. Be part of the first cohort of developers who sell on their own terms.</p>
+    <div class="final-counter">
+      <div class="avatar-row">
+        <div class="avatar avatar-1">JM</div>
+        <div class="avatar avatar-2">SR</div>
+        <div class="avatar avatar-3">AL</div>
+        <div class="avatar avatar-4">TK</div>
+        <div class="avatar avatar-5">PB</div>
+      </div>
+      <div class="counter-text">
+        <strong id="footer-counter">312</strong> developers already waiting
+      </div>
+    </div>
+    <div id="waitlist-form-wrap">
+      <form class="waitlist-form" onsubmit="handleWaitlistSubmit(event)">
+        <input type="email" placeholder="Enter your email" required autocomplete="email" aria-label="Email address">
+        <button type="submit" class="btn-primary">Join the Waitlist</button>
+      </form>
+      <p class="trust-line">No credit card. No lock-in. Australian-built for Australian developers.</p>
+    </div>
+    <div class="thank-you" id="thank-you-msg">
+      You're on the list. We'll be in touch.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FOOTER
+═══════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <div class="nav-mark">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4L20 8V12C20 16.4 16.4 20.4 12 21C7.6 20.4 4 16.4 4 12V8L12 4Z" fill="white" opacity="0.25"/>
+            <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="footer-wordmark">Vendor<span>led</span></span>
+      </div>
+      <ul class="footer-links">
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQs</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+      <span class="footer-tagline">Your sale. Your terms.</span>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Vendorled. All rights reserved.</span>
+      <a href="mailto:hello@vendorled.com.au" class="footer-contact">hello@vendorled.com.au</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── NAV SCROLL ── */
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  /* ── MOBILE MENU ── */
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+  });
+  function closeMobileMenu() { mobileMenu.classList.remove('open'); }
+
+  /* ── WAITLIST COUNTER ANIMATION ── */
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function animateCounter(el, from, to, duration) {
+    const start = performance.now();
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const value = Math.round(from + (to - from) * easeOutCubic(progress));
+      el.textContent = value;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  window.addEventListener('load', () => {
+    const heroCounter = document.getElementById('hero-counter');
+    animateCounter(heroCounter, 47, 312, 2500);
+  });
+
+  /* ── ROI CALCULATOR ── */
+  function fmt(n) {
+    return '$' + Math.round(n).toLocaleString('en-AU');
+  }
+  function calcROI() {
+    const units = parseInt(document.getElementById('roi-units').value);
+    const price = parseInt(document.getElementById('roi-price').value);
+    const commRate = parseFloat(document.getElementById('roi-commission').value);
+
+    document.getElementById('val-units').textContent = units + ' unit' + (units !== 1 ? 's' : '');
+    document.getElementById('val-price').textContent = fmt(price);
+    document.getElementById('val-commission').textContent = commRate.toFixed(2) + '%';
+
+    const agentTotal = units * price * (commRate / 100);
+    // Professional plan: $999/mo × 12 + $2,999 setup
+    const vendorledCost = (999 * 12) + 2999;
+    const saving = Math.max(0, agentTotal - vendorledCost);
+
+    document.getElementById('roi-commission-total').textContent = fmt(agentTotal);
+    document.getElementById('roi-vendorled-cost').textContent = fmt(vendorledCost);
+    document.getElementById('roi-saving').textContent = fmt(saving);
+  }
+  calcROI();
+
+  /* ── FAQ ACCORDION ── */
+  function toggleFAQ(el) {
+    const item = el.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  /* ── WAITLIST FORM ── */
+  function handleWaitlistSubmit(e) {
+    e.preventDefault();
+    document.getElementById('waitlist-form-wrap').style.display = 'none';
+    const msg = document.getElementById('thank-you-msg');
+    msg.style.display = 'block';
+  }
+
+  /* ── SMOOTH SCROLL for anchor links ── */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        const offset = target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
