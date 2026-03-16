@@ -42,14 +42,14 @@
 
   /* ── PHOTO GALLERY STRIP ── */
   .gallery-strip {
-    background: var(--color-dark);
     padding: 0;
     overflow: hidden;
   }
   .gallery-strip-inner {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
-    height: 440px;
+    grid-template-columns: repeat(4, 1fr);
+    height: 380px;
+    gap: 3px;
   }
   .gallery-photo {
     overflow: hidden;
@@ -58,31 +58,40 @@
   .gallery-photo img {
     width: 100%; height: 100%;
     object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+    display: block;
+  }
+  .gallery-photo:hover img { transform: scale(1.05); }
+
+  /* ── PHOTO GRID ── */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 300px 300px;
+    gap: 12px;
+  }
+  .photo-grid-item {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .photo-grid-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
     transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
   }
-  .gallery-photo:hover img { transform: scale(1.04); }
-  .gallery-photo-label {
-    position: absolute;
-    bottom: 16px; left: 16px;
-    background: rgba(13,13,13,0.72);
-    backdrop-filter: blur(8px);
-    color: white;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: var(--radius-pill);
-    letter-spacing: 0.04em;
-  }
-  .gallery-divider { width: 1px; background: rgba(255,255,255,0.1); }
+  .photo-grid-item:hover img { transform: scale(1.03); }
 
   @media (max-width: 768px) {
     .gallery-strip-inner {
-      grid-template-columns: 1fr;
-      height: auto;
+      grid-template-columns: 1fr 1fr;
+      height: 320px;
     }
-    .gallery-photo { height: 260px; }
-    .gallery-divider { display: none; }
+    .photo-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+    .photo-grid-item { height: 240px; }
   }
 
   /* ── GRAIN OVERLAY ── */
@@ -1620,18 +1629,16 @@
 <section class="gallery-strip" aria-label="Development photography">
   <div class="gallery-strip-inner">
     <div class="gallery-photo">
-      <img src="images/coastal-townhouse.jpg" alt="Modern coastal townhouse development, Adelaide" loading="lazy">
-      <span class="gallery-photo-label">Coastal townhouse · Adelaide</span>
+      <img src="images/aerial-coastal.jpg" alt="Aerial view of coastal residential development" loading="lazy">
     </div>
-    <div class="gallery-divider"></div>
     <div class="gallery-photo">
-      <img src="images/somerton-render.webp" alt="Somerton Park dual occupancy exterior render" loading="lazy">
-      <span class="gallery-photo-label">Somerton Park · Dual occ</span>
+      <img src="images/coastal-townhouse.jpg" alt="Modern coastal townhouse development" loading="lazy" style="object-position:center 70%;">
     </div>
-    <div class="gallery-divider"></div>
     <div class="gallery-photo">
-      <img src="images/interior-living.webp" alt="Modern interior living and kitchen" loading="lazy">
-      <span class="gallery-photo-label">Seacliff Park · Interior</span>
+      <img src="images/interior-living.webp" alt="Contemporary interior living space" loading="lazy">
+    </div>
+    <div class="gallery-photo">
+      <img src="images/contemporary-subdivision.jpg" alt="Contemporary residential subdivision" loading="lazy">
     </div>
   </div>
 </section>
@@ -2025,7 +2032,7 @@
 </section>
 
 <!-- ═══════════════════════════════
-     PHOTO PROOF BAND
+     PHOTO GRID
 ═══════════════════════════════ -->
 <section style="background:var(--color-surface);padding:80px 0;">
   <div class="container">
@@ -2034,20 +2041,18 @@
       <h2 class="section-headline">The kind of developments<br>Vendorled is built for.</h2>
       <p class="section-sub mx-auto" style="margin-top:16px;">From dual-occ townhouses to multi-unit coastal projects — any development selling direct to buyers.</p>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-      <div style="border-radius:16px;overflow:hidden;aspect-ratio:4/3;position:relative;">
-        <img src="images/interior-kitchen.webp" alt="Somerton Park interior kitchen render" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;bottom:16px;left:16px;background:rgba(13,13,13,0.7);backdrop-filter:blur(8px);color:white;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;">Somerton Park · Kitchen &amp; Living</div>
+    <div class="photo-grid">
+      <div class="photo-grid-item">
+        <img src="images/interior-kitchen.webp" alt="Modern kitchen and living interior" loading="lazy">
       </div>
-      <div style="display:grid;grid-template-rows:1fr 1fr;gap:20px;">
-        <div style="border-radius:16px;overflow:hidden;position:relative;">
-          <img src="images/seacliff-exterior.webp" alt="Seacliff Park exterior render" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;">
-          <div style="position:absolute;bottom:12px;left:12px;background:rgba(13,13,13,0.7);backdrop-filter:blur(8px);color:white;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;">Seacliff Park · Exterior</div>
-        </div>
-        <div style="border-radius:16px;overflow:hidden;position:relative;">
-          <img src="images/somerton-render.webp" alt="Somerton Park exterior render" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-          <div style="position:absolute;bottom:12px;left:12px;background:rgba(13,13,13,0.7);backdrop-filter:blur(8px);color:white;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;">Somerton Park · Exterior</div>
-        </div>
+      <div class="photo-grid-item">
+        <img src="images/aerial-coastal.jpg" alt="Aerial view of coastal development" loading="lazy">
+      </div>
+      <div class="photo-grid-item">
+        <img src="images/somerton-render.webp" alt="Dual occupancy exterior render" loading="lazy">
+      </div>
+      <div class="photo-grid-item">
+        <img src="images/interior-living.webp" alt="Contemporary living space interior" loading="lazy">
       </div>
     </div>
   </div>
