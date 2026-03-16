@@ -40,6 +40,51 @@
   a { color: inherit; text-decoration: none; }
   button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
+  /* ── PHOTO GALLERY STRIP ── */
+  .gallery-strip {
+    background: var(--color-dark);
+    padding: 0;
+    overflow: hidden;
+  }
+  .gallery-strip-inner {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    height: 440px;
+  }
+  .gallery-photo {
+    overflow: hidden;
+    position: relative;
+  }
+  .gallery-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .gallery-photo:hover img { transform: scale(1.04); }
+  .gallery-photo-label {
+    position: absolute;
+    bottom: 16px; left: 16px;
+    background: rgba(13,13,13,0.72);
+    backdrop-filter: blur(8px);
+    color: white;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.04em;
+  }
+  .gallery-divider { width: 1px; background: rgba(255,255,255,0.1); }
+
+  @media (max-width: 768px) {
+    .gallery-strip-inner {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+    .gallery-photo { height: 260px; }
+    .gallery-divider { display: none; }
+  }
+
   /* ── GRAIN OVERLAY ── */
   body::before {
     content: '';
@@ -224,7 +269,20 @@
     align-items: center;
     background: linear-gradient(160deg, #fff 0%, #F7F4FF 55%, #EDE8FF 100%);
     overflow: hidden;
+    position: relative;
   }
+  .hero-bg-photo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 60%;
+    opacity: 0.08;
+  }
+  .hero-inner { position: relative; z-index: 1; }
   .hero-inner {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1198,7 +1256,21 @@
     background: linear-gradient(160deg, #fff 0%, #F7F4FF 100%);
     padding: 120px 0;
     text-align: center;
+    position: relative;
+    overflow: hidden;
   }
+  .final-cta-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .final-cta-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    opacity: 0.07;
+  }
+  .final-cta .container { position: relative; z-index: 1; }
   .final-cta h2 {
     font-size: clamp(36px, 4.5vw, 58px);
     font-weight: 800;
@@ -1415,6 +1487,9 @@
      HERO
 ═══════════════════════════════ -->
 <section class="hero">
+  <div class="hero-bg-photo">
+    <img src="images/coastal-townhouse.jpg" alt="" aria-hidden="true">
+  </div>
   <div class="hero-inner">
     <div class="hero-content">
       <span class="eyebrow">AI-powered property sales</span>
@@ -1540,6 +1615,28 @@
 </section>
 
 <!-- ═══════════════════════════════
+     GALLERY STRIP
+═══════════════════════════════ -->
+<section class="gallery-strip" aria-label="Development photography">
+  <div class="gallery-strip-inner">
+    <div class="gallery-photo">
+      <img src="images/coastal-townhouse.jpg" alt="Modern coastal townhouse development, Adelaide" loading="lazy">
+      <span class="gallery-photo-label">Coastal townhouse · Adelaide</span>
+    </div>
+    <div class="gallery-divider"></div>
+    <div class="gallery-photo">
+      <img src="images/somerton-render.webp" alt="Somerton Park dual occupancy exterior render" loading="lazy">
+      <span class="gallery-photo-label">Somerton Park · Dual occ</span>
+    </div>
+    <div class="gallery-divider"></div>
+    <div class="gallery-photo">
+      <img src="images/interior-living.webp" alt="Modern interior living and kitchen" loading="lazy">
+      <span class="gallery-photo-label">Seacliff Park · Interior</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
      SOLUTION
 ═══════════════════════════════ -->
 <section class="solution section-pad" id="how-it-works">
@@ -1636,7 +1733,9 @@
               <div class="browser-url">riviera-apartments.vendorled.com.au</div>
             </div>
             <div class="browser-content">
-              <div class="site-hero-mock">Riviera Apartments</div>
+              <div class="site-hero-mock" style="padding:0;height:90px;overflow:hidden;">
+                <img src="images/seacliff-exterior.webp" alt="Seacliff Park development" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;border-radius:8px 8px 0 0;display:block;">
+              </div>
               <div class="unit-grid-mock">
                 <div class="unit-chip">1BR<br>From $420k</div>
                 <div class="unit-chip">2BR<br>From $590k</div>
@@ -1926,6 +2025,35 @@
 </section>
 
 <!-- ═══════════════════════════════
+     PHOTO PROOF BAND
+═══════════════════════════════ -->
+<section style="background:var(--color-surface);padding:80px 0;">
+  <div class="container">
+    <div class="text-center" style="margin-bottom:48px;">
+      <span class="eyebrow">Real Projects</span>
+      <h2 class="section-headline">The kind of developments<br>Vendorled is built for.</h2>
+      <p class="section-sub mx-auto" style="margin-top:16px;">From dual-occ townhouses to multi-unit coastal projects — any development selling direct to buyers.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div style="border-radius:16px;overflow:hidden;aspect-ratio:4/3;position:relative;">
+        <img src="images/interior-kitchen.webp" alt="Somerton Park interior kitchen render" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+        <div style="position:absolute;bottom:16px;left:16px;background:rgba(13,13,13,0.7);backdrop-filter:blur(8px);color:white;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;">Somerton Park · Kitchen &amp; Living</div>
+      </div>
+      <div style="display:grid;grid-template-rows:1fr 1fr;gap:20px;">
+        <div style="border-radius:16px;overflow:hidden;position:relative;">
+          <img src="images/seacliff-exterior.webp" alt="Seacliff Park exterior render" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;">
+          <div style="position:absolute;bottom:12px;left:12px;background:rgba(13,13,13,0.7);backdrop-filter:blur(8px);color:white;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;">Seacliff Park · Exterior</div>
+        </div>
+        <div style="border-radius:16px;overflow:hidden;position:relative;">
+          <img src="images/somerton-render.webp" alt="Somerton Park exterior render" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+          <div style="position:absolute;bottom:12px;left:12px;background:rgba(13,13,13,0.7);backdrop-filter:blur(8px);color:white;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px;">Somerton Park · Exterior</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
      PRICING
 ═══════════════════════════════ -->
 <section class="pricing section-pad" id="pricing">
@@ -2075,6 +2203,9 @@
      FINAL CTA
 ═══════════════════════════════ -->
 <section class="final-cta" id="waitlist">
+  <div class="final-cta-bg">
+    <img src="images/coastal-home.jpg" alt="" aria-hidden="true">
+  </div>
   <div class="container">
     <span class="final-tagline">Your sale. Your terms.</span>
     <h2>Stop paying agents to open doors<br>you could open yourself.</h2>
